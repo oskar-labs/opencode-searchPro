@@ -1,0 +1,11 @@
+# Local-only files: never commit these
+__pycache__/
+*.py[cod]
+*.db*
+*.db-*
+*.bak*
+
+# Personal machine config / notes / one-off scripts
+opencode.json
+PLAN.md
+rename_one.py
