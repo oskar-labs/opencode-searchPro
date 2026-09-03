@@ -20,19 +20,29 @@ opencode's Home search only matches auto-generated session titles. SearchPro que
 - **Dark mode** — follows your system, toggleable, remembered
 - **Zero dependencies** — Python standard library only; UI via CDN Tailwind
 
-## Quickstart
+## Install
 
-Requirements: Python 3.10+ and opencode (any recent version) with its local database
-(`~/.local/share/opencode/opencode.db`).
+Prerequisites: [git](https://git-scm.com), Python 3.10+, and opencode
+(any recent version) with its local database.
 
 ```powershell
-# Web dashboard (recommended)
+# Windows (PowerShell) — open any folder, e.g. Documents
+cd ~\Documents
+git clone https://github.com/oskar-labs/opencode-searchPro.git
+cd opencode-searchPro
 python web.py
-# open http://127.0.0.1:8765
+# open http://127.0.0.1:8765  (or double-click start-web.bat)
+```
 
-# ...or use the launcher: start-web.bat (Windows), start-web.sh (macOS/Linux)
+```sh
+# macOS / Linux
+git clone https://github.com/oskar-labs/opencode-searchPro.git
+cd opencode-searchPro
+./start-web.sh   # chmod +x start-web.sh first if needed
+```
 
-# CLI
+```powershell
+# CLI (all platforms)
 python search.py "rate limit" --limit 20
 python search.py --all --limit 20
 python search.py "docker" --project "my-app" --json
