@@ -8,7 +8,9 @@ Full-text search over your [opencode](https://github.com/anomalyco/opencode) his
 
 ## Why
 
-opencode's Home search only matches auto-generated session titles. SearchPro queries the actual message content in opencode's local SQLite database, so you can find "that thing about rate limiting from last Tuesday" by its words.
+OpenCode's Home search only matches auto-generated session titles. You wont find anything of a sessions actual content.
+
+SearchPro queries the actual message content in opencode's local SQLite database, so you can find "that thing about rate limiting from last Tuesday" by its words.
 
 ## Features
 
