@@ -219,6 +219,7 @@ async function search(){
     data.forEach((item)=>{
       const marked = bmSet.has(item.messageID);
       const projShort = (item.project||'').replace(/\\/g,'/').split('/').slice(-2).join('/') || item.project;
+      const folderTitle = item.worktree ? `${item.project}\nregistry worktree: ${item.worktree}` : item.project;
       const el=document.createElement('div');
       el.className='card relative bg-[#e4e8ed] dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 p-4 sm:p-5';
       el.innerHTML=`
@@ -236,7 +237,7 @@ async function search(){
             </div>
             <div class="mb-2 flex gap-2">
               <span class="text-xs font-mono text-zinc-500 dark:text-zinc-400 w-28 shrink-0">Folder:</span>
-              <span class="text-xs text-zinc-500 dark:text-zinc-400">${projShort||'global'}</span>
+              <span class="text-xs text-zinc-500 dark:text-zinc-400" title="${escA(folderTitle)}">${projShort||'global'}</span>
             </div>
             <div class="mt-1 flex gap-2 text-xs text-zinc-500 dark:text-zinc-400">
               <span class="font-mono w-28 shrink-0">Session created:</span>

@@ -108,25 +108,25 @@ def format_row(r, idx):
         dt = datetime.datetime.fromtimestamp(int(t)/1000).strftime("%Y-%m-%d %H:%M")
     except:
         dt = str(t)
-    # Prefer session_dir (actual working folder at session time) over project worktree.
-    # For global project, worktree is "/" which is not useful.
+    # session.directory is the source of truth; never fuse it with the
+    # registry worktree (the 'global' worktree drifts, producing nonsense).
     session_dir = r["session_dir"] or ""
     proj_wt = r["project_worktree"] or ""
-    if proj_wt and proj_wt != "/" and proj_wt != "global" and session_dir and proj_wt.lower() not in session_dir.lower():
-        proj = f"{session_dir} ({proj_wt})"
-    else:
-        proj = session_dir or proj_wt or "?"
+    wt_diff = bool(proj_wt and proj_wt != "/" and proj_wt != "global"
+                   and session_dir and proj_wt.lower() not in session_dir.lower())
+    base = session_dir or (proj_wt if proj_wt != "/" else "") or "?"
     # shorten for table but keep full in JSON
-    proj_short = proj
-    if len(proj_short) > 38:
-        # keep last segment + first char of parent for context
-        parts = proj_short.replace("\\", "/").split("/")
+    def short(p, n=38):
+        if len(p) <= n:
+            return p
         # Show last 2 meaningful parts
-        meaningful = [p for p in parts if p]
+        meaningful = [x for x in p.replace("\\", "/").split("/") if x]
         if len(meaningful) >= 2:
-            proj_short = "/".join(meaningful[-2:])
-        else:
-            proj_short = proj_short[-38:]
+            return "/".join(meaningful[-2:])
+        return p[-n:]
+    proj_short = short(base)
+    if wt_diff:
+        proj_short = f"{short(base, 20)} [wt:{short(proj_wt, 20)}]"
     title = r["session_title"] or "(untitled)"
     if len(title) > 45:
         title = title[:42] + "…"
@@ -184,7 +184,7 @@ def main():
         print(format_row(r, i))
     print(sep)
     print(f"\nFound {len(rows)} prompts" + (f" matching '{q}'" if q else " (recent)"))
-    print("Projects shown are session.project_id -> project.worktree (working folder) and session.directory")
+    print("Project column is session.directory (working folder); [wt:...] marks a differing registry worktree")
     print("\nTo open in opencode:")
     print("  Desktop Ctrl+B -> find working folder (Project column) -> open session by Session Title")
 

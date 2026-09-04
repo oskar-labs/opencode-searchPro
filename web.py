@@ -242,6 +242,7 @@ async function search(){
     data.forEach((item)=>{
       const marked = bmSet.has(item.messageID);
       const projShort = (item.project||'').replace(/\\/g,'/').split('/').slice(-2).join('/') || item.project;
+      const folderTitle = item.worktree ? `${item.project}\nregistry worktree: ${item.worktree}` : item.project;
       const el=document.createElement('div');
       el.className='card relative bg-[#e4e8ed] dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 p-4 sm:p-5';
       el.innerHTML=`
@@ -259,7 +260,7 @@ async function search(){
             </div>
             <div class="mb-2 flex gap-2">
               <span class="text-xs font-mono text-zinc-500 dark:text-zinc-400 w-28 shrink-0">Folder:</span>
-              <span class="text-xs text-zinc-500 dark:text-zinc-400">${projShort||'global'}</span>
+              <span class="text-xs text-zinc-500 dark:text-zinc-400" title="${escA(folderTitle)}">${projShort||'global'}</span>
             </div>
             <div class="mt-1 flex gap-2 text-xs text-zinc-500 dark:text-zinc-400">
               <span class="font-mono w-28 shrink-0">Session created:</span>
@@ -432,10 +433,11 @@ def query(q, project, limit, roles=("user",)):
         key=(r["session_id"], r["role"], txt[:80])
         if key in seen: continue
         seen.add(key)
-        # prefer directory over worktree "/"
-        proj = r["directory"] or r["project"] or ""
-        if r["project"] and r["project"]!="/" and r["project"].lower() not in (proj or "").lower():
-            proj = f"{proj} ({r['project']})" if proj else r["project"]
+        # session.directory is the source of truth; never fuse it with the
+        # registry worktree (the 'global' worktree drifts, producing nonsense).
+        d = r["directory"] or ""
+        w = r["project"] or ""
+        wt_diff = bool(w and w != "/" and d and w.lower() not in d.lower())
         # center snippet on query if present, else first 220
         norm=" ".join(txt.split())
         if q_lower and q_lower in norm.lower():
@@ -460,7 +462,7 @@ def query(q, project, limit, roles=("user",)):
             context=norm[:600]
             if len(norm)>600: context=context+"…"
         t=r["time_updated"] or r["time_created"] or 0
-        out.append({"messageID":r["message_id"], "sessionID":r["session_id"], "title":r["title"] or "(untitled)", "project":proj or "global", "snippet":snippet, "context":context, "time":int(t), "created":int(r["time_created"] or 0), "msgTime":int(r["msg_time"] or 0), "role":r["role"] or "user"})
+        out.append({"messageID":r["message_id"], "sessionID":r["session_id"], "title":r["title"] or "(untitled)", "project":d or (w if w != "/" else "") or "global", "worktree":w if wt_diff else "", "snippet":snippet, "context":context, "time":int(t), "created":int(r["time_created"] or 0), "msgTime":int(r["msg_time"] or 0), "role":r["role"] or "user"})
         if len(out)>=int(limit): break
     con.close()
     return out
