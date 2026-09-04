@@ -6,6 +6,8 @@ Full-text search over your [opencode](https://github.com/anomalyco/opencode) his
 
 > Unofficial community project. Not affiliated with the opencode team.
 
+![dashboard](docs/screenshot1.png)
+
 ## Why
 
 OpenCode's Home search only matches auto-generated session titles. You wont find anything of a sessions actual content.
